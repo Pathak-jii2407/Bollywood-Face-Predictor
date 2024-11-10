@@ -85,6 +85,6 @@ if uploaded_image is not None:
                 st.image(display_image, width=100)
             with col2:
                 st.header("Seems like " + predicted_actor)
-                st.image(filenames[index_pos], width=100)
+                st.text(filenames[index_pos])
         else:
             st.error("No face detected in the uploaded image. Please try again with a different image.")
