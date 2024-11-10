@@ -14,18 +14,27 @@ detector = MTCNN()
 model = VGGFace(model='resnet50', include_top=False, input_shape=(224, 224, 3), pooling='avg')
 
 # Load precomputed features and filenames
-feature_list = pickle.load(open(f"{os.path.join('embedding.pkl')}", 'rb'))
-filenames = pickle.load(open(f"{os.path.join('filename.pkl')}", 'rb'))
+try:
+    feature_list = pickle.load(open(f"{os.path.join('embedding.pkl')}", 'rb'))
+    filenames = pickle.load(open(f"{os.path.join('filename.pkl')}", 'rb'))
+except FileNotFoundError:
+    st.error("Precomputed embeddings or filenames not found. Please ensure embedding.pkl and filename.pkl are present in the directory.")
+    st.stop()
 
 # Save the uploaded image function
 def save_uploaded_image(uploaded_image):
     try:
-        with open(os.path.join(f"{os.path.join('uploads')}", uploaded_image.name), 'wb') as f:
+        # Save image to the 'uploads' folder
+        upload_folder = 'uploads'
+        if not os.path.exists(upload_folder):
+            os.makedirs(upload_folder)
+        image_path = os.path.join(upload_folder, uploaded_image.name)
+        with open(image_path, 'wb') as f:
             f.write(uploaded_image.getbuffer())
-        return True
+        return image_path
     except Exception as e:
         st.error(f"Error saving the image: {e}")
-        return False
+        return None
 
 # Extract features from the image using the model
 def extract_features(img_path, model, detector):
@@ -35,6 +44,7 @@ def extract_features(img_path, model, detector):
     if len(results) == 0:  # No face detected
         return None
 
+    # Get the bounding box of the face and extract the face
     x, y, width, height = results[0]['box']
     face = img[y:y + height, x:x + width]
 
@@ -66,11 +76,12 @@ uploaded_image = st.file_uploader('Choose an image')
 
 if uploaded_image is not None:
     # Save the uploaded image
-    if save_uploaded_image(uploaded_image):
+    image_path = save_uploaded_image(uploaded_image)
+    if image_path is not None:
         display_image = Image.open(uploaded_image)
 
-        # Extract features from the image
-        features = extract_features(os.path.join('uploads', uploaded_image.name), model, detector)
+        # Extract features from the uploaded image
+        features = extract_features(image_path, model, detector)
 
         if features is not None:
             # Recommend a celebrity
@@ -85,6 +96,9 @@ if uploaded_image is not None:
                 st.image(display_image, width=100)
             with col2:
                 st.header("Seems like " + predicted_actor)
-                st.text(filenames[index_pos])
+                celebrity_image_path = os.path.join('uploads', filenames[index_pos])
+                celebrity_image = Image.open(celebrity_image_path)
+                st.image(celebrity_image, caption=predicted_actor, use_column_width=True)
+
         else:
             st.error("No face detected in the uploaded image. Please try again with a different image.")
