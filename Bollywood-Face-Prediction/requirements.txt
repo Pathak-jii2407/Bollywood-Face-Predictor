@@ -24,6 +24,7 @@ joblib==1.4.2
 jsonschema==4.23.0
 jsonschema-specifications==2024.10.1
 keras==3.6.0
+keras-applications==1.0.8
 keras-vggface==0.6
 libclang==18.1.1
 lz4==4.3.3
