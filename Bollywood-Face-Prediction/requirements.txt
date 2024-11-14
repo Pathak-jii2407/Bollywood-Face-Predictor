@@ -23,6 +23,7 @@ jsonschema-specifications==2024.10.1
 keras==3.6.0
 keras_applications
 keras-vggface==0.6
+layer_utils
 libclang==18.1.1
 lz4==4.3.3
 Markdown==3.7
