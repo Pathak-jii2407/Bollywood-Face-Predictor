@@ -96,9 +96,9 @@ if uploaded_image is not None:
                 st.image(display_image, width=100)
             with col2:
                 st.header("Seems like " + predicted_actor)
-                celebrity_image_path = os.path.join('uploads', filenames[index_pos])
-                celebrity_image = Image.open(celebrity_image_path)
-                st.image(celebrity_image, caption=predicted_actor, use_column_width=True)
+                #celebrity_image_path = os.path.join('uploads', filenames[index_pos])
+                #celebrity_image = Image.open(celebrity_image_path)
+                #st.image(celebrity_image, caption=predicted_actor, use_column_width=True)
 
         else:
             st.error("No face detected in the uploaded image. Please try again with a different image.")
